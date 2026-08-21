@@ -1,0 +1,11 @@
+# LabCrew OpenSpec configuration
+
+context: |
+  LabCrew is a hypothesis-first research factory.
+  It produces Research Packages that can be handed to DevCrew for product engineering.
+  Core principles: no hypothesis → no experiment; cheap experiments first; evaluation is not optional.
+
+rules:
+  - Every research cycle must start from explicit hypotheses.
+  - Production infrastructure is out of scope until research validates the idea.
+  - Final output of a successful cycle is a Research Package suitable for handoff.
