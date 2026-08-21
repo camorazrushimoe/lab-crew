@@ -1,118 +1,189 @@
 # Lab Crew — research & experimentation factory
 
-A portable team of isolated agents (Docker containers) focused on **hypothesis-driven research** before product development.
+LabCrew is a small team of AI agents that turns fuzzy product ideas into **validated research** before anyone builds a product.
 
-LabCrew lives **before** [DevCrew](https://github.com/camorazrushimoe/dev-crew).  
-Its job is to turn fuzzy business ideas into validated understanding, evaluation designs, and clear handoff packages that DevCrew can implement.
+It lives **before** [DevCrew](https://github.com/camorazrushimoe/dev-crew).
 
-## The team (v0)
+- DevCrew builds software from specs.
+- LabCrew answers: *Is this idea real? What should we measure? What data do we actually need?*
 
-| Container | Role | Door (webhook) |
-|-----------|------|----------------|
-| `research-lead` | Formulates research questions & hypotheses, tracks experiments, writes research reports & handoff specs | `:8751` |
-| `research-engineer` | Executes experiments: quick parsers, data collection, scripts, baseline analysis | `:8752` |
-| `evaluation` | Designs and runs evaluation (auto-eval, human grading protocols, metrics, reproducibility) | `:8753` |
+When research is solid, LabCrew produces a **Research Package** and hands it off. It does not build the product itself.
 
-**Infrastructure**
+---
 
-| Container | Purpose |
-|-----------|---------|
-| `shared-memory` | Redis message bus + shared state |
+## How the factory works (the cycle)
 
-## Core idea
-
-DevCrew builds software **spec-first**.  
-LabCrew works **hypothesis-first**.
-
-Typical flow:
-
-1. Manager / business brings a fuzzy idea  
-   (“Want market intelligence for games from Steam + community signals”  
-   or “Want an agentic loop with solid evaluation”).
-2. LabCrew runs a research cycle:
-   - formulate hypotheses
-   - design cheap experiments
-   - collect just enough data (often temporary / local)
-   - measure & evaluate
-   - decide what is real vs noise
-3. Output = **Research Package** that can be handed to DevCrew:
-   - validated / rejected hypotheses
-   - data sources & collection approach
-   - evaluation design
-   - recommended metrics
-   - draft product requirements / OpenSpec sketch
-
-## High-level workflow
+This is the main loop. Everything LabCrew does fits into it.
 
 ```text
-Idea / Research Brief
-        ↓
-Research Lead → Research Questions + Hypotheses
-        ↓
-Research Engineer → Experiments + Data Collection (quick & dirty)
-        ↓
-Evaluation Specialist → Metrics, auto-eval, human grading design
-        ↓
-Joint review → Research Report + Handoff Package
-        ↓
-(optional) → DevCrew receives clean input and builds the product
+1. BRIEF
+   Manager / business brings a fuzzy idea.
+   Example: “We want market intelligence for games from Steam and community signals.”
+
+2. HYPOTHESES
+   Research Lead turns the idea into explicit, testable hypotheses
+   with success and failure criteria.
+
+3. EXPERIMENT DESIGN
+   Research Engineer designs the cheapest way to test a hypothesis.
+   Evaluation Specialist defines how success will be measured.
+
+4. DATA + EXECUTION
+   Research Engineer collects just enough data (often temporary)
+   and runs the experiment. No production infrastructure yet.
+
+5. EVALUATION
+   Evaluation Specialist scores the results (auto-eval and/or human grading),
+   checks for leakage, bias and other traps, and reports a verdict.
+
+6. SYNTHESIS
+   Research Lead writes the Research Report:
+   what was supported, rejected, or still unclear — with confidence and caveats.
+
+7. HANDOFF (optional)
+   If the idea is worth building, Research Lead packages a clean handoff
+   for DevCrew: data sources, metrics, draft requirements, open questions.
+   If not — the cycle stops or goes back to new hypotheses.
 ```
 
-Key principle: **cheap experiments first**.  
-No production databases, vector stores, or full pipelines until a hypothesis is worth the investment.
+**Golden rules of the cycle**
 
-## What LabCrew produces (artifacts)
+- No hypothesis → no experiment
+- Cheap experiments first
+- Evaluation is not optional
+- Handoff is a first-class output (not an afterthought)
+
+A concrete walkthrough of this cycle is here:  
+[docs/examples/market-intelligence-cycle.md](docs/examples/market-intelligence-cycle.md)
+
+---
+
+## The workers
+
+Three agents. Each has a clear specialty. They collaborate through briefs, shared artifacts, and the message bus.
+
+### 1. Research Lead
+
+**Specialty:** thinking and structure.
+
+Turns messy ideas into clear research questions and hypotheses. Owns the overall research direction, tracks status, writes the final report, and decides whether something is ready for product work.
+
+**What this agent does well**
+- Rewrite a vague idea into sharp, falsifiable hypotheses
+- Prioritize what is worth testing now vs later
+- Write experiment briefs for the engineer
+- Keep the hypotheses log up to date
+- Synthesize results into a Research Report
+- Produce a clean handoff package for DevCrew
+
+**What this agent does *not* do**
+- Write production code or production pipelines
+- Own long-term infrastructure
+- Run the final product after launch
+
+**Core skills:** `hypothesis-crafting`, `research-briefing`, `research-tracking`, `synthesis`, `handoff`
+
+---
+
+### 2. Research Engineer
+
+**Specialty:** getting evidence fast.
+
+Takes a hypothesis and turns it into a cheap experiment: parsers, temporary data, scripts, basic analysis. Optimizes for speed and clarity, not for production systems.
+
+**What this agent does well**
+- Design the cheapest viable experiment for a hypothesis
+- Write lightweight parsers (web, APIs, files, store pages, etc.)
+- Collect and organize temporary datasets with provenance notes
+- Run exploratory analysis (tables, distributions, simple comparisons)
+- Leave scripts and notes that others can re-run or audit
+
+**What this agent does *not* do**
+- Build production data platforms or long-lived services
+- Jump to complex models before basic evidence exists
+- Skip measurement design — coordinates with Evaluation Specialist
+
+**Core skills:** `experiment-design`, `quick-parsing`, `data-collection`, `exploratory-analysis`, `reproducible-notes`
+
+---
+
+### 3. Evaluation Specialist
+
+**Specialty:** honest measurement.
+
+Makes sure the team actually knows whether a hypothesis is supported. Designs metrics, auto-evaluation, human grading protocols, and actively looks for ways results could be misleading.
+
+**What this agent does well**
+- Choose metrics that match the research question (not just easy numbers)
+- Design and implement automatic evaluation
+- Design clear human grading protocols (definitions, examples, agreement checks)
+- Critique evaluation for leakage, cherry-picking, bias, tiny samples
+- Write evaluation sections that can go straight into the Research Report
+
+**What this agent does *not* do**
+- Own the overall research direction (that is Research Lead)
+- Accept “looks good” as a result
+- Build production monitoring systems
+
+**Core skills:** `metric-design`, `auto-eval`, `human-grading`, `evaluation-critique`, `eval-reporting`
+
+---
+
+## What the factory produces
 
 | Artifact | Owner | Purpose |
 |----------|-------|---------|
-| `hypotheses.md` / experiment log | research-lead | Living list of hypotheses + status |
-| Experiment scripts / notebooks | research-engineer | Reproducible (enough) experiments |
-| Evaluation design | evaluation | How we will measure success |
-| Research Report | research-lead + team | Final findings, confidence, recommendations |
-| Handoff Package | research-lead | Ready-to-use input for DevCrew (data sources, metrics, draft requirements) |
+| `hypotheses.md` | Research Lead | Living list of hypotheses + status |
+| Experiment scripts / data | Research Engineer | Evidence for/against hypotheses |
+| Evaluation design + results | Evaluation Specialist | How success was measured |
+| Research Report | Research Lead | Findings, confidence, recommendations |
+| Handoff package | Research Lead | Input for DevCrew (if the idea is worth building) |
+
+Typical layout inside a research topic:
+
+```text
+workspace/<topic>/
+  BRIEF.md
+  hypotheses.md
+  experiments/
+  data/
+  evaluation/
+  report.md
+  handoff/
+```
+
+---
 
 ## Relationship to DevCrew
 
-- LabCrew answers: *“Is this idea real? How do we measure it? What data do we actually need?”*
-- DevCrew answers: *“How do we build a reliable product around this?”*
+| Question | Who answers |
+|----------|-------------|
+| Is this idea real? What should we measure? | **LabCrew** |
+| How do we build a reliable product around it? | **DevCrew** |
 
-LabCrew should never try to become a product engineering team.  
-When the research is solid, it hands off and steps back.
+LabCrew stops at understanding.  
+DevCrew starts when understanding is good enough to build.
 
-## Foundation docs & specs
+---
+
+## Foundation docs
 
 | Document | Purpose |
 |----------|---------|
 | [FACTORY-STANDARD.md](crew/FACTORY-STANDARD.md) | Golden rules |
-| [docs/architecture.md](docs/architecture.md) | Architecture overview |
-| [docs/workflow.md](docs/workflow.md) | Research cycle & artifact layout |
-| [docs/skills-overview.md](docs/skills-overview.md) | Skills per role |
-| [docs/examples/market-intelligence-cycle.md](docs/examples/market-intelligence-cycle.md) | Worked example of a full research cycle |
-| `openspec/specs/` | Capability specs (`agent-roles`, `research-cycle`, `artifacts`, `handoff`) |
-
-## Project layout
-
-```
-agents/
-  research-lead/
-  research-engineer/
-  evaluation/
-crew/
-  FACTORY-STANDARD.md
-openspec/
-  config.yaml
-  specs/
-docs/
-  examples/
-workspace/               # temporary experiment data & notebooks (gitignored)
-```
-
-## Status
-
-v0.2 — foundation specification largely in place.  
-Roles, SOULs, core capability specs, main skills and a concrete Market Intelligence example cycle are drafted.  
-Next: remaining skills, then implementation (compose, doors, bus) when you are ready to deploy and try it on a real project.
+| [docs/architecture.md](docs/architecture.md) | Architecture |
+| [docs/workflow.md](docs/workflow.md) | Cycle & artifact conventions |
+| [docs/skills-overview.md](docs/skills-overview.md) | Full skills list |
+| [docs/examples/market-intelligence-cycle.md](docs/examples/market-intelligence-cycle.md) | Worked example |
+| `openspec/specs/` | Capability specs |
 
 ---
 
-See also: [DevCrew](https://github.com/camorazrushimoe/dev-crew) — the product engineering factory that receives LabCrew’s handoff packages.
+## Status
+
+v0.3 — foundation specification complete for the research cycle and all core skills.  
+Next step: implementation (Docker Compose, webhook doors, shared bus) when ready to deploy and run on a real project.
+
+---
+
+See also: [DevCrew](https://github.com/camorazrushimoe/dev-crew)
