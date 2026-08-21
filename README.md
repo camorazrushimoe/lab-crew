@@ -86,7 +86,8 @@ When the research is solid, it hands off and steps back.
 | [FACTORY-STANDARD.md](crew/FACTORY-STANDARD.md) | Golden rules |
 | [docs/architecture.md](docs/architecture.md) | Architecture overview |
 | [docs/workflow.md](docs/workflow.md) | Research cycle & artifact layout |
-| [docs/skills-overview.md](docs/skills-overview.md) | Intended skills per role |
+| [docs/skills-overview.md](docs/skills-overview.md) | Skills per role |
+| [docs/examples/market-intelligence-cycle.md](docs/examples/market-intelligence-cycle.md) | Worked example of a full research cycle |
 | `openspec/specs/` | Capability specs (`agent-roles`, `research-cycle`, `artifacts`, `handoff`) |
 
 ## Project layout
@@ -102,14 +103,15 @@ openspec/
   config.yaml
   specs/
 docs/
+  examples/
 workspace/               # temporary experiment data & notebooks (gitignored)
 ```
 
 ## Status
 
-v0.1 — foundation specification in progress.  
-Roles, SOULs, core capability specs and first skills are drafted.  
-Next: more skills, concrete example cycle (Market Intelligence), then implementation (compose, doors, bus).
+v0.2 — foundation specification largely in place.  
+Roles, SOULs, core capability specs, main skills and a concrete Market Intelligence example cycle are drafted.  
+Next: remaining skills, then implementation (compose, doors, bus) when you are ready to deploy and try it on a real project.
 
 ---
 
