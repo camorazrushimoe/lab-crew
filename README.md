@@ -79,25 +79,37 @@ No production databases, vector stores, or full pipelines until a hypothesis is 
 LabCrew should never try to become a product engineering team.  
 When the research is solid, it hands off and steps back.
 
-## Project layout (planned)
+## Foundation docs & specs
+
+| Document | Purpose |
+|----------|---------|
+| [FACTORY-STANDARD.md](crew/FACTORY-STANDARD.md) | Golden rules |
+| [docs/architecture.md](docs/architecture.md) | Architecture overview |
+| [docs/workflow.md](docs/workflow.md) | Research cycle & artifact layout |
+| [docs/skills-overview.md](docs/skills-overview.md) | Intended skills per role |
+| `openspec/specs/` | Capability specs (`agent-roles`, `research-cycle`, `artifacts`, `handoff`) |
+
+## Project layout
 
 ```
-docker-compose.yml
 agents/
   research-lead/
   research-engineer/
   evaluation/
 crew/
-bus/
+  FACTORY-STANDARD.md
 openspec/
-workspace/               # temporary experiment data & notebooks (gitignored)
+  config.yaml
+  specs/
 docs/
+workspace/               # temporary experiment data & notebooks (gitignored)
 ```
 
 ## Status
 
-v0 — design phase.  
-We are defining roles, skills, workflow and factory standards before implementing the agents.
+v0.1 — foundation specification in progress.  
+Roles, SOULs, core capability specs and first skills are drafted.  
+Next: more skills, concrete example cycle (Market Intelligence), then implementation (compose, doors, bus).
 
 ---
 
