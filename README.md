@@ -2,12 +2,16 @@
 
 LabCrew is a small team of AI agents that turns fuzzy product ideas into **validated research** before anyone builds a product.
 
-It lives **before** [DevCrew](https://github.com/camorazrushimoe/dev-crew).
+It lives **before** product implementation ([DevCrew](https://github.com/camorazrushimoe/dev-crew) / Dev instances under Office).
 
-- DevCrew builds software from specs.
-- LabCrew answers: *Is this idea real? What should we measure? What data do we actually need?*
+- Dev builds software from specs.
+- Lab answers: *Is this idea real? What should we measure? What data do we actually need?*
 
 When research is solid, LabCrew produces a **Research Package** and hands it off. It does not build the product itself.
+
+> **Agent Office:** this repo is also a **team template** under [Agent Office](https://github.com/camorazrushimoe/agent-office).  
+> Multiple Lab instances can be composed from pinned refs of this template.  
+> See [docs/office-template.md](docs/office-template.md) for the Office-compatible contract (shared bus, lifecycle, handoff via Office).
 
 ---
 
@@ -42,7 +46,7 @@ This is the main loop. Everything LabCrew does fits into it.
 
 7. HANDOFF (optional)
    If the idea is worth building, Research Lead packages a clean handoff
-   for DevCrew: data sources, metrics, draft requirements, open questions.
+   for Dev (via Agent Office when composed): data sources, metrics, draft requirements, open questions.
    If not — the cycle stops or goes back to new hypotheses.
 ```
 
@@ -74,7 +78,7 @@ Turns messy ideas into clear research questions and hypotheses. Owns the overall
 - Write experiment briefs for the engineer
 - Keep the hypotheses log up to date
 - Synthesize results into a Research Report
-- Produce a clean handoff package for DevCrew
+- Produce a clean handoff package for Dev / Office
 
 **What this agent does *not* do**
 - Write production code or production pipelines
@@ -137,7 +141,7 @@ Makes sure the team actually knows whether a hypothesis is supported. Designs me
 | Experiment scripts / data | Research Engineer | Evidence for/against hypotheses |
 | Evaluation design + results | Evaluation Specialist | How success was measured |
 | Research Report | Research Lead | Findings, confidence, recommendations |
-| Handoff package | Research Lead | Input for DevCrew (if the idea is worth building) |
+| Handoff package | Research Lead | Input for Dev / Office (if the idea is worth building) |
 
 Typical layout inside a research topic:
 
@@ -154,15 +158,15 @@ workspace/<topic>/
 
 ---
 
-## Relationship to DevCrew
+## Relationship to Dev and Agent Office
 
 | Question | Who answers |
 |----------|-------------|
-| Is this idea real? What should we measure? | **LabCrew** |
-| How do we build a reliable product around it? | **DevCrew** |
+| Is this idea real? What should we measure? | **Lab** |
+| How do we build a reliable product around it? | **Dev** (routed via **Agent Office** when composed) |
 
-LabCrew stops at understanding.  
-DevCrew starts when understanding is good enough to build.
+Lab stops at understanding.  
+Dev starts when understanding is good enough to build.
 
 ---
 
@@ -175,6 +179,7 @@ DevCrew starts when understanding is good enough to build.
 | [docs/workflow.md](docs/workflow.md) | Cycle & artifact conventions |
 | [docs/skills-overview.md](docs/skills-overview.md) | Full skills list |
 | [docs/examples/market-intelligence-cycle.md](docs/examples/market-intelligence-cycle.md) | Worked example |
+| [docs/office-template.md](docs/office-template.md) | Agent Office template contract |
 | `openspec/specs/` | Capability specs |
 
 ---
@@ -182,8 +187,8 @@ DevCrew starts when understanding is good enough to build.
 ## Status
 
 v0.3 — foundation specification complete for the research cycle and all core skills.  
-Next step: implementation (Docker Compose, webhook doors, shared bus) when ready to deploy and run on a real project.
+Office template contract documented; Docker runtime implementation should default to Office-attach capability.
 
 ---
 
-See also: [DevCrew](https://github.com/camorazrushimoe/dev-crew)
+See also: [Agent Office](https://github.com/camorazrushimoe/agent-office) · [DevCrew](https://github.com/camorazrushimoe/dev-crew)
