@@ -1,0 +1,20 @@
+{
+  "research-lead": {
+    "host_url": "http://localhost:8651/webhooks/inbox",
+    "container_url": "http://lab-crew-research-lead:8644/webhooks/inbox",
+    "secret": "ЗАМЕНИ_НА_СЕКРЕТ_АГЕНТА",
+    "wake_hint": "lab-crew:research-lead"
+  },
+  "research-engineer": {
+    "host_url": "http://localhost:8652/webhooks/inbox",
+    "container_url": "http://lab-crew-research-engineer:8644/webhooks/inbox",
+    "secret": "ЗАМЕНИ_НА_СЕКРЕТ_АГЕНТА",
+    "wake_hint": "lab-crew:research-engineer"
+  },
+  "evaluation": {
+    "host_url": "http://localhost:8653/webhooks/inbox",
+    "container_url": "http://lab-crew-evaluation:8644/webhooks/inbox",
+    "secret": "ЗАМЕНИ_НА_СЕКРЕТ_АГЕНТА",
+    "wake_hint": "lab-crew:evaluation"
+  }
+}
