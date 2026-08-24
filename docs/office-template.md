@@ -52,15 +52,21 @@ This repo MAY support standalone operation for developing the research factory i
 
 ## Implementation roadmap (spec → code)
 
-Lab Crew is still largely specification-stage for Docker runtime. When implementing, Office-compatible mode should be the default design:
+Done (Office-attached compose is now the default — see `docker-compose.yml`):
 
-- [ ] Compose with external Redis configuration
-- [ ] Lifecycle controller + agent `restart: "no"`
+- [x] Compose with external Redis configuration — external network
+      `agent-office-crew`, no local Redis, `OFFICE_BUS_URL` env.
+- [x] Agent `restart: "no"` (controller-managed).
+- [x] Env vars documented for Office attach (`TEAM_NAME`, `OFFICE_BUS_URL`,
+      `DOOR_SECRET_*`, `CUSTOM_API_KEY`) — see `.env.example`.
+
+Still pending (next PRs):
+
+- [ ] Lifecycle controller service (idle stop + wake on demand)
 - [ ] Wake-aware door client
 - [ ] Busy lock / activity signals for long research steps
 - [ ] Team-qualified actors when `TEAM_NAME` is set
 - [ ] Handoff events aimed at Office (`research.ready`, handoff package pointers)
-- [ ] Env vars documented for Office attach
 
 ## Versioning
 
