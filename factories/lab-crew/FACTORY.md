@@ -27,10 +27,6 @@ It lives **before** product implementation ([DevCrew](https://github.com/camoraz
 
 When research is solid, LabCrew produces a **Research Package** and hands it off. It does not build the product itself.
 
-> **Agent Office:** this repo is also a **team template** under [Agent Office](https://github.com/camorazrushimoe/agent-office).  
-> Multiple Lab instances can be composed from pinned refs of this template.  
-> See [docs/office-template.md](docs/office-template.md) for the Office-compatible contract (shared bus, lifecycle, handoff via Office).
-
 ## Agents
 
 | Agent | Role | SDLC Phase |

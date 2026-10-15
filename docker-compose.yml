@@ -1,19 +1,18 @@
 name: ${TEAM_NAME:-lab-crew}
 
-# Lab Crew — Office-attached mode.
+# Lab Crew — standalone research factory.
 #
 # Research team: turns fuzzy ideas into research questions, hypotheses, and
-# Research Packages handed off to the Office (which routes to Spec/Dev).
+# Research Packages handed off to product engineering (DevCrew).
 # Lab teams do not need a private dev-cluster — workspace is enough.
 #
-# Agents join the Agent Office shared bus (external network agent-office-crew);
-# no local Redis. Containers are lifecycle-controller-managed (restart: "no").
+# All agents communicate through webhook doors on an internal bridge network
+# (lab-crew-net). No external bus or Redis required.
 #
 # Env (from .env — see .env.example):
 #   TEAM_NAME         instance id (default: lab-crew)
-#   OFFICE_BUS_URL    Office Redis (default: redis://shared-memory:6379)
 #   CUSTOM_API_KEY    LLM key (runinfra)
-#   DOOR_SECRET_*     per-agent door HMAC secrets
+#   DOOR_SECRET_*     per-agent door HMAC secrets (optional, for agent-to-agent comms)
 #   LAB_PORT_*        host port overrides (defaults 8651–8653)
 #
 # Doors: POST /webhooks/inbox on 8644 in-container, host-mapped below.
@@ -24,7 +23,7 @@ services:
     image: nousresearch/hermes-agent:latest
     container_name: ${TEAM_NAME:-lab-crew}-research-lead
     restart: "no"
-    networks: [office]
+    networks: [lab-crew-net]
     volumes:
       - ./agents/research-lead/hermes-home:/opt/data
       - ./skills/hypothesis-crafting:/opt/data/skills/lab-crew/hypothesis-crafting:ro
@@ -40,7 +39,6 @@ services:
       - HERMES_WRITE_SAFE_ROOT=/opt/data:/workspace
       - CUSTOM_API_KEY=${CUSTOM_API_KEY:-}
       - DOOR_SECRET=${DOOR_SECRET_RESEARCH_LEAD:-}
-      - OFFICE_BUS_URL=${OFFICE_BUS_URL:-redis://shared-memory:6379}
       - TEAM_NAME=${TEAM_NAME:-lab-crew}
     ports:
       - "${LAB_PORT_RESEARCH_LEAD:-8651}:8644"
@@ -50,7 +48,7 @@ services:
     image: nousresearch/hermes-agent:latest
     container_name: ${TEAM_NAME:-lab-crew}-research-engineer
     restart: "no"
-    networks: [office]
+    networks: [lab-crew-net]
     volumes:
       - ./agents/research-engineer/hermes-home:/opt/data
       - ./skills/experiment-design:/opt/data/skills/lab-crew/experiment-design:ro
@@ -66,7 +64,6 @@ services:
       - HERMES_WRITE_SAFE_ROOT=/opt/data:/workspace
       - CUSTOM_API_KEY=${CUSTOM_API_KEY:-}
       - DOOR_SECRET=${DOOR_SECRET_RESEARCH_ENGINEER:-}
-      - OFFICE_BUS_URL=${OFFICE_BUS_URL:-redis://shared-memory:6379}
       - TEAM_NAME=${TEAM_NAME:-lab-crew}
     ports:
       - "${LAB_PORT_RESEARCH_ENGINEER:-8652}:8644"
@@ -76,7 +73,7 @@ services:
     image: nousresearch/hermes-agent:latest
     container_name: ${TEAM_NAME:-lab-crew}-evaluation
     restart: "no"
-    networks: [office]
+    networks: [lab-crew-net]
     volumes:
       - ./agents/evaluation/hermes-home:/opt/data
       - ./skills/metric-design:/opt/data/skills/lab-crew/metric-design:ro
@@ -92,13 +89,11 @@ services:
       - HERMES_WRITE_SAFE_ROOT=/opt/data:/workspace
       - CUSTOM_API_KEY=${CUSTOM_API_KEY:-}
       - DOOR_SECRET=${DOOR_SECRET_EVALUATION:-}
-      - OFFICE_BUS_URL=${OFFICE_BUS_URL:-redis://shared-memory:6379}
       - TEAM_NAME=${TEAM_NAME:-lab-crew}
     ports:
       - "${LAB_PORT_EVALUATION:-8653}:8644"
     command: ["sh", "-c", "python3 /opt/crew/render_config.py && exec hermes gateway run"]
 
 networks:
-  office:
-    external: true
-    name: agent-office-crew
+  lab-crew-net:
+    driver: bridge
