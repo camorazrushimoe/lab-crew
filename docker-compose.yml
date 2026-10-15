@@ -27,7 +27,11 @@ services:
     networks: [office]
     volumes:
       - ./agents/research-lead/hermes-home:/opt/data
-      - ./agents/research-lead/skills:/opt/data/skills/lab-crew:ro
+      - ./skills/hypothesis-crafting:/opt/data/skills/lab-crew/hypothesis-crafting:ro
+      - ./skills/research-briefing:/opt/data/skills/lab-crew/research-briefing:ro
+      - ./skills/research-tracking:/opt/data/skills/lab-crew/research-tracking:ro
+      - ./skills/synthesis:/opt/data/skills/lab-crew/synthesis:ro
+      - ./skills/handoff:/opt/data/skills/lab-crew/handoff:ro
       - ./crew:/opt/crew:ro
       - ./workspace:/workspace
     environment:
@@ -49,7 +53,11 @@ services:
     networks: [office]
     volumes:
       - ./agents/research-engineer/hermes-home:/opt/data
-      - ./agents/research-engineer/skills:/opt/data/skills/lab-crew:ro
+      - ./skills/experiment-design:/opt/data/skills/lab-crew/experiment-design:ro
+      - ./skills/quick-parsing:/opt/data/skills/lab-crew/quick-parsing:ro
+      - ./skills/data-collection:/opt/data/skills/lab-crew/data-collection:ro
+      - ./skills/exploratory-analysis:/opt/data/skills/lab-crew/exploratory-analysis:ro
+      - ./skills/reproducible-notes:/opt/data/skills/lab-crew/reproducible-notes:ro
       - ./crew:/opt/crew:ro
       - ./workspace:/workspace
     environment:
@@ -71,7 +79,11 @@ services:
     networks: [office]
     volumes:
       - ./agents/evaluation/hermes-home:/opt/data
-      - ./agents/evaluation/skills:/opt/data/skills/lab-crew:ro
+      - ./skills/metric-design:/opt/data/skills/lab-crew/metric-design:ro
+      - ./skills/auto-eval:/opt/data/skills/lab-crew/auto-eval:ro
+      - ./skills/human-grading:/opt/data/skills/lab-crew/human-grading:ro
+      - ./skills/evaluation-critique:/opt/data/skills/lab-crew/evaluation-critique:ro
+      - ./skills/eval-reporting:/opt/data/skills/lab-crew/eval-reporting:ro
       - ./crew:/opt/crew:ro
       - ./workspace:/workspace:ro
     environment:
