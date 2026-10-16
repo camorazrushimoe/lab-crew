@@ -1,14 +1,16 @@
 model:
-  default: qwen3-8-27b
+  default: qwen2.5-14b-instruct
   provider: custom
-  base_url: https://api.runinfra.ai/v1
-  api_key: ${CUSTOM_API_KEY}
+  base_url: http://192.168.31.56:1234/v1
+  api_key: not-needed
+  context_length: 131072
 agent:
   api_max_retries: 8
 platforms:
   webhook:
     enabled: true
     extra:
+      host: 127.0.0.1
       port: 8644
       routes:
         inbox:

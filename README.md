@@ -2,16 +2,12 @@
 
 LabCrew is a small team of AI agents that turns fuzzy product ideas into **validated research** before anyone builds a product.
 
-It lives **before** product implementation ([DevCrew](https://github.com/camorazrushimoe/dev-crew) / Dev instances under Office).
+It lives **before** product implementation (any Dev team that builds from specs).
 
 - Dev builds software from specs.
 - Lab answers: *Is this idea real? What should we measure? What data do we actually need?*
 
 When research is solid, LabCrew produces a **Research Package** and hands it off. It does not build the product itself.
-
-> **Agent Office:** this repo is also a **team template** under [Agent Office](https://github.com/camorazrushimoe/agent-office).  
-> Multiple Lab instances can be composed from pinned refs of this template.  
-> See [docs/office-template.md](docs/office-template.md) for the Office-compatible contract (shared bus, lifecycle, handoff via Office).
 
 ---
 
@@ -46,7 +42,7 @@ This is the main loop. Everything LabCrew does fits into it.
 
 7. HANDOFF (optional)
    If the idea is worth building, Research Lead packages a clean handoff
-   for Dev (via Agent Office when composed): data sources, metrics, draft requirements, open questions.
+   for a Dev team: data sources, metrics, draft requirements, open questions.
    If not — the cycle stops or goes back to new hypotheses.
 ```
 
@@ -78,7 +74,7 @@ Turns messy ideas into clear research questions and hypotheses. Owns the overall
 - Write experiment briefs for the engineer
 - Keep the hypotheses log up to date
 - Synthesize results into a Research Report
-- Produce a clean handoff package for Dev / Office
+- Produce a clean handoff package for a Dev team
 
 **What this agent does *not* do**
 - Write production code or production pipelines
@@ -141,7 +137,7 @@ Makes sure the team actually knows whether a hypothesis is supported. Designs me
 | Experiment scripts / data | Research Engineer | Evidence for/against hypotheses |
 | Evaluation design + results | Evaluation Specialist | How success was measured |
 | Research Report | Research Lead | Findings, confidence, recommendations |
-| Handoff package | Research Lead | Input for Dev / Office (if the idea is worth building) |
+| Handoff package | Research Lead | Input for a Dev team (if the idea is worth building) |
 
 Typical layout inside a research topic:
 
@@ -163,7 +159,7 @@ workspace/<topic>/
 | Question | Who answers |
 |----------|-------------|
 | Is this idea real? What should we measure? | **Lab** |
-| How do we build a reliable product around it? | **Dev** (routed via **Agent Office** when composed) |
+| How do we build a reliable product around it? | **Dev** |
 
 Lab stops at understanding.  
 Dev starts when understanding is good enough to build.
@@ -179,7 +175,6 @@ Dev starts when understanding is good enough to build.
 | [docs/workflow.md](docs/workflow.md) | Cycle & artifact conventions |
 | [docs/skills-overview.md](docs/skills-overview.md) | Full skills list |
 | [docs/examples/market-intelligence-cycle.md](docs/examples/market-intelligence-cycle.md) | Worked example |
-| [docs/office-template.md](docs/office-template.md) | Agent Office template contract |
 | `openspec/specs/` | Capability specs |
 
 ---
@@ -187,8 +182,8 @@ Dev starts when understanding is good enough to build.
 ## Status
 
 v0.3 — foundation specification complete for the research cycle and all core skills.  
-Office template contract documented; Docker runtime implementation should default to Office-attach capability.
+Docker runtime is standalone (local bridge network, three agents communicating via webhook doors).
 
 ---
 
-See also: [Agent Office](https://github.com/camorazrushimoe/agent-office) · [DevCrew](https://github.com/camorazrushimoe/dev-crew)
+See also: [FACTORY-STANDARD.md](crew/FACTORY-STANDARD.md) · [AI Assets Marketplace](https://leap.epam.com/sp/ai-marketplace)
