@@ -1,9 +1,11 @@
 model:
-  default: qwen2.5-14b-instruct
+  default: google/gemma-4-12b
   provider: custom
   base_url: http://192.168.31.56:1234/v1
   api_key: not-needed
   context_length: 131072
+  max_tokens: 16384
+  reasoning_effort: high
 agent:
   api_max_retries: 8
 platforms:
