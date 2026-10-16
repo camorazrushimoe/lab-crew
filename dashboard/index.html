@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Crew — Dashboard</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --muted: #8b949e;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+    --blue: #58a6ff;
+    --purple: #bc8cff;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding:24px; max-width:1100px; margin:0 auto; }
+  h1 { font-size:20px; font-weight:600; margin-bottom:4px; }
+  .subtitle { color:var(--muted); font-size:13px; margin-bottom:24px; }
+  .factory-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600; margin-bottom:20px; }
+  .factory-badge.running { background:#1a3a1a; color:var(--green); border:1px solid #2a5a2a; }
+  .factory-badge.degraded { background:#3a2a0a; color:var(--yellow); border:1px solid #5a4a0a; }
+  .factory-badge.stopped { background:#3a1a1a; color:var(--red); border:1px solid #5a2a2a; }
+  .agents { display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-bottom:24px; }
+  @media (max-width: 768px) { .agents { grid-template-columns: 1fr; } }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:16px; }
+  .card-header { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+  .card-icon { font-size:24px; }
+  .card-label { font-size:15px; font-weight:600; flex:1; }
+  .status-dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+  .status-dot.on { background:var(--green); box-shadow: 0 0 6px var(--green); }
+  .status-dot.off { background:var(--red); }
+  .card-body { font-size:13px; line-height:1.5; }
+  .card-body .muted { color:var(--muted); }
+  .card-body .activity { color:var(--blue); font-weight:500; }
+  .card-body .empty { color:var(--muted); font-style:italic; }
+  .sessions { font-size:11px; color:var(--muted); margin-top:8px; }
+  .history-title { font-size:14px; font-weight:600; margin-bottom:8px; color:var(--text); }
+  .history { margin-top:16px; }
+  .history-item { display:flex; gap:10px; padding:6px 0; border-bottom:1px solid var(--border); font-size:12px; align-items:baseline; }
+  .history-item:last-child { border-bottom:0; }
+  .history-role { font-weight:600; min-width:70px; flex-shrink:0; }
+  .history-role.assistant { color:var(--purple); }
+  .history-role.user { color:var(--blue); }
+  .history-text { color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; }
+  .history-ts { color:var(--muted); font-size:10px; flex-shrink:0; min-width:50px; text-align:right; }
+  .refresh { color:var(--muted); font-size:11px; text-align:right; margin-top:16px; }
+  .pulse { animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity:1; } 50% { opacity:0.5; } }
+</style>
+</head>
+<body>
+<h1>⚕️ Lab Crew Dashboard</h1>
+<div class="subtitle" id="subtitle">Monitoring research-lead, research-engineer, evaluation</div>
+
+<div id="factory-badge" class="factory-badge stopped">● Factory Offline</div>
+
+<div class="agents">
+  <div class="card" id="card-research-lead">
+    <div class="card-header">
+      <span class="card-icon">🧠</span>
+      <span class="card-label">Research Lead</span>
+      <span class="status-dot off"></span>
+    </div>
+    <div class="card-body"><span class="empty">—</span></div>
+    <div class="sessions">sessions: —</div>
+  </div>
+  <div class="card" id="card-research-engineer">
+    <div class="card-header">
+      <span class="card-icon">🔧</span>
+      <span class="card-label">Research Engineer</span>
+      <span class="status-dot off"></span>
+    </div>
+    <div class="card-body"><span class="empty">—</span></div>
+    <div class="sessions">sessions: —</div>
+  </div>
+  <div class="card" id="card-evaluation">
+    <div class="card-header">
+      <span class="card-icon">📊</span>
+      <span class="card-label">Evaluation Specialist</span>
+      <span class="status-dot off"></span>
+    </div>
+    <div class="card-body"><span class="empty">—</span></div>
+    <div class="sessions">sessions: —</div>
+  </div>
+</div>
+
+<div class="history">
+  <div class="history-title">📋 Recent Activity</div>
+  <div id="history-list"><span class="muted">Waiting for data...</span></div>
+</div>
+
+<div class="refresh" id="refresh">updating...</div>
+
+<script>
+const AGENT_KEYS = ['research-lead', 'research-engineer', 'evaluation'];
+const KNOWN_TS = new Set();
+
+function formatTime(ts) {
+  if (!ts) return '';
+  const d = new Date(ts + 'Z');
+  return d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+}
+
+function formatTimeAgo(ts) {
+  if (!ts) return '';
+  const d = new Date(ts + 'Z');
+  const now = new Date();
+  const sec = Math.floor((now - d) / 1000);
+  if (sec < 60) return sec + 's ago';
+  if (sec < 3600) return Math.floor(sec/60) + 'm ago';
+  return Math.floor(sec/3600) + 'h ago';
+}
+
+function updateCard(key, agent) {
+  const card = document.getElementById('card-' + key);
+  const dot = card.querySelector('.status-dot');
+  const body = card.querySelector('.card-body');
+  const sessions = card.querySelector('.sessions');
+
+  if (agent.running) {
+    dot.className = 'status-dot on';
+  } else {
+    dot.className = 'status-dot off';
+  }
+
+  if (agent.last_message && agent.last_message.content) {
+    const role = agent.last_message.role === 'assistant' ? '💬' : '👤';
+    body.innerHTML = `<span class="activity">${role}</span> ${agent.last_message.content}`;
+  } else if (agent.running) {
+    body.innerHTML = '<span class="muted">Idle — waiting for input</span>';
+  } else {
+    body.innerHTML = '<span class="empty">Offline</span>';
+  }
+
+  sessions.textContent = 'sessions: ' + (agent.active_sessions || 0);
+}
+
+function updateHistory(allAgents) {
+  const container = document.getElementById('history-list');
+
+  // Collect all history items from all agents
+  let items = [];
+  for (const [key, agent] of Object.entries(allAgents)) {
+    if (agent.history) {
+      for (const h of agent.history) {
+        items.push({...h, agent: key, label: agent.label});
+      }
+    }
+  }
+
+  // Sort by timestamp desc
+  items.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  // Deduplicate by ts+role+content
+  const seen = new Set();
+  items = items.filter(i => {
+    const k = i.ts + '|' + i.role + '|' + i.content;
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+  // Take last 8
+  items = items.slice(0, 8);
+
+  if (items.length === 0) {
+    container.innerHTML = '<span class="muted">No activity yet</span>';
+    return;
+  }
+
+  container.innerHTML = items.map(i => {
+    const cls = i.role === 'assistant' ? 'assistant' : 'user';
+    const icon = i.role === 'assistant' ? '💬' : '👤';
+    const shortLabel = i.label ? i.label.split(' ')[0] : i.agent;
+    return `<div class="history-item">
+      <span class="history-role ${cls}">${icon} ${shortLabel}</span>
+      <span class="history-text">${i.content || '(empty)'}</span>
+      <span class="history-ts">${formatTimeAgo(i.ts)}</span>
+    </div>`;
+  }).join('');
+}
+
+async function refresh() {
+  try {
+    const resp = await fetch('/api/status');
+    const data = await resp.json();
+
+    // Factory badge
+    const badge = document.getElementById('factory-badge');
+    badge.className = 'factory-badge ' + data.factory_status;
+    if (data.factory_status === 'running') {
+      badge.innerHTML = '<span class="status-dot on" style="display:inline-block;margin-right:4px;"></span> Factory Running';
+    } else if (data.factory_status === 'degraded') {
+      badge.innerHTML = '<span class="status-dot on" style="display:inline-block;margin-right:4px;background:var(--yellow);box-shadow:none;"></span> Factory Degraded';
+    } else {
+      badge.innerHTML = '<span class="status-dot off" style="display:inline-block;margin-right:4px;"></span> Factory Offline';
+    }
+
+    // Agent cards
+    for (const key of AGENT_KEYS) {
+      updateCard(key, data.agents[key] || {});
+    }
+
+    // History
+    updateHistory(data.agents);
+
+    document.getElementById('refresh').textContent = 'updated ' + formatTime(data.ts);
+  } catch(e) {
+    document.getElementById('refresh').textContent = 'connection error';
+  }
+}
+
+refresh();
+setInterval(refresh, 3000);
+</script>
+</body>
+</html>
